@@ -8,16 +8,15 @@
 
 #import "ViewController.h"
 #import "TableViewCell.h"
-#import "DataService.h"
 #import "FeedItem.h"
+#import "FeedHTTPClient.h"
 #import "UIImageView+AFNetworking.h"
 
 static const int CELL_CONTENT_MARGIN = 10;
 
-@interface ViewController () <UITableViewDataSource, UITableViewDelegate>
+@interface ViewController () <UITableViewDataSource, UITableViewDelegate, FeedHTTPClientDelegate>
 {
     NSMutableArray *_dataProvider;
-    DataService *_service;
 }
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *spinner;
@@ -39,13 +38,10 @@ static const int CELL_CONTENT_MARGIN = 10;
     [self.tableView registerNib:[UINib nibWithNibName:@"TableViewCell" bundle:nil]
          forCellReuseIdentifier:@"Cell"];
     
-    [DataService loadFeedWithSuccess:^(id json) {
-        NSLog(@"%@", json);
-        [self translateJson:[json valueForKey:@"posts"]];
-        
-        self.spinner.hidden = YES;
-        [self.tableView reloadData];
-    }];
+    FeedHTTPClient *client = [FeedHTTPClient sharedFeedHTTPClient];
+    client.delegate = self;
+    [client readFeedData];
+    
 }
 
 #pragma mark - table delegate methods
@@ -101,9 +97,27 @@ static const int CELL_CONTENT_MARGIN = 10;
     return _dataProvider.count;
 }
 
-#pragma mark - private methods
+#pragma mark - http client delegate methods 
 
-//TODO:move to serializer class, extend AFJSONResponseSerializer?
+-(void)feedHTTPClient:(FeedHTTPClient *)client didUpdateWithData:(id)data
+{
+    [self translateJson:[data valueForKey:@"posts"]];
+    self.spinner.hidden = YES;
+    [self.tableView reloadData];
+}
+
+-(void)feedHTTPClient:(FeedHTTPClient *)client didFailWithError:(NSError *)error
+{
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Error Retrieving Data"
+                                                        message:[error localizedDescription]
+                                                       delegate:nil
+                                              cancelButtonTitle:@"Ok"
+                                              otherButtonTitles:nil];
+    [alertView show];    
+}
+
+
+#pragma mark - private methods
 
 -(void)translateJson:(NSArray *)array
 {
