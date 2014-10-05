@@ -7,25 +7,15 @@
 //
 
 #import <Foundation/Foundation.h>
-
-static NSString *const kComments = @"comment_count";
-static NSString *const kContent = @"content";
-static NSString *const kDate = @"created_at";
-static NSString *const kLikes = @"like_count";
-static NSString *const kUserUrl = @"user.avatar";
-static NSString *const kUserName = @"user.first_name";
-static NSString *const kUserLastName = @"user.last_name";
-
+#import "User.h"
 
 @interface FeedItem : NSObject
-@property(nonatomic, strong)NSString *content;
-@property(nonatomic, strong)NSString *createdDate;
-@property(nonatomic, strong)NSString *userAvatar;
-@property(nonatomic, strong)NSString *userName;
-@property(nonatomic, strong)NSString *userLastName;
-@property int commentCount;
-@property int likeCount;
+@property(nonatomic, readonly, strong)NSString *content;
+@property(nonatomic, readonly, strong)NSString *createdDate;
+@property(nonatomic, readonly, strong)User *user;
+@property(nonatomic, readonly) int commentCount;
+@property(nonatomic, readonly) int likeCount;
 
-+(FeedItem *)itemFromDictionary:(NSDictionary *)dict;
+-(FeedItem *)initWithDictionary:(NSDictionary *)dict;
 
 @end

@@ -8,21 +8,29 @@
 
 #import "FeedItem.h"
 
+static NSString *const kComments = @"comment_count";
+static NSString *const kContent = @"content";
+static NSString *const kDate = @"created_at";
+static NSString *const kLikes = @"like_count";
+static NSString *const kUser = @"user";
+
 @implementation FeedItem
 
-+(FeedItem *)itemFromDictionary:(NSDictionary *)dict
+-(FeedItem *)initWithDictionary:(NSDictionary *)dict
 {
-    FeedItem *item = [[FeedItem alloc] init];
+    self = [super init];
     
-    item.content = [dict valueForKeyPath:kContent];
-    item.createdDate = [dict valueForKeyPath:kDate];
-    item.userAvatar = [dict valueForKeyPath:kUserUrl];
-    item.userName = [dict valueForKeyPath:kUserName];
-    item.userLastName = [dict valueForKeyPath:kUserLastName];
-    item.commentCount = [[dict valueForKeyPath:kComments] intValue];
-    item.likeCount = [[dict valueForKeyPath:kLikes] intValue];
+    if (!self) {
+        return nil;
+    }
     
-    return item;
+    _content = [dict valueForKeyPath:kContent];
+    _createdDate = [dict valueForKeyPath:kDate];
+    _user = [[User alloc] initWithDictionary:[dict valueForKeyPath:kUser]];
+    _commentCount = [[dict valueForKeyPath:kComments] intValue];
+    _likeCount = [[dict valueForKeyPath:kLikes] intValue];
+    
+    return self;
 }
 
 @end

@@ -6,24 +6,23 @@
 //  Copyright (c) 2014 Katerina Nerush. All rights reserved.
 //
 
-#import "ViewController.h"
+#import "FeedViewController.h"
 #import "TableViewCell.h"
 #import "FeedItem.h"
+#import "User.h"
 #import "FeedHTTPClient.h"
 #import "UIImageView+AFNetworking.h"
 
 static const int CELL_CONTENT_MARGIN = 10;
 
-@interface ViewController () <UITableViewDataSource, UITableViewDelegate, FeedHTTPClientDelegate>
-{
-    NSMutableArray *_dataProvider;
-}
+@interface FeedViewController () <UITableViewDataSource, UITableViewDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *spinner;
+@property (nonatomic, strong)NSArray *dataProvider;
 
 @end
 
-@implementation ViewController
+@implementation FeedViewController
 
 
 #pragma mark - lifecycle methods
@@ -38,10 +37,7 @@ static const int CELL_CONTENT_MARGIN = 10;
     [self.tableView registerNib:[UINib nibWithNibName:@"TableViewCell" bundle:nil]
          forCellReuseIdentifier:@"Cell"];
     
-    FeedHTTPClient *client = [FeedHTTPClient sharedFeedHTTPClient];
-    client.delegate = self;
-    [client readFeedData];
-    
+    [self readData];
 }
 
 #pragma mark - table delegate methods
@@ -58,11 +54,11 @@ static const int CELL_CONTENT_MARGIN = 10;
     FeedItem *cellData = _dataProvider[indexPath.item];
     
     cell.content.text = cellData.content;
-    cell.name.text = [NSString stringWithFormat:@"%@ %@", cellData.userName, cellData.userLastName];
+    cell.name.text = [NSString stringWithFormat:@"%@ %@", cellData.user.firstName, cellData.user.lastName];
     cell.likes.text = [NSString stringWithFormat:@"%d", cellData.likeCount];
     cell.comments.text = [NSString stringWithFormat:@"%d", cellData.commentCount];
     
-    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:cellData.userAvatar]];
+    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:cellData.user.avatarImageURL]];
     UIImage *placeholderImage = [UIImage imageNamed:@"placeholder"];
     
     __weak TableViewCell *weakCell = cell;
@@ -97,40 +93,28 @@ static const int CELL_CONTENT_MARGIN = 10;
     return _dataProvider.count;
 }
 
-#pragma mark - http client delegate methods 
-
--(void)feedHTTPClient:(FeedHTTPClient *)client didUpdateWithData:(id)data
-{
-    [self translateJson:[data valueForKey:@"posts"]];
-    self.spinner.hidden = YES;
-    [self.tableView reloadData];
-}
-
--(void)feedHTTPClient:(FeedHTTPClient *)client didFailWithError:(NSError *)error
-{
-    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Error Retrieving Data"
-                                                        message:[error localizedDescription]
-                                                       delegate:nil
-                                              cancelButtonTitle:@"Ok"
-                                              otherButtonTitles:nil];
-    [alertView show];    
-}
-
 
 #pragma mark - private methods
 
--(void)translateJson:(NSArray *)array
+-(void)readData
 {
-    _dataProvider = [NSMutableArray array];
-    NSArray *ar = [array valueForKey:@"data"];
+    FeedHTTPClient *client = [FeedHTTPClient sharedFeedHTTPClient];
+    [client readFeedDataWithSuccess:^(NSArray *responseObject) {
+    
+        _dataProvider = responseObject;
+        self.spinner.hidden = YES;
+        [self.tableView reloadData];
 
-    //start thread, translate data
-    for (int i = 0; i < ar.count-1; i++) {
-        
-        NSDictionary *dict = ar[i];
-        FeedItem *item = [FeedItem itemFromDictionary:dict];
-        [_dataProvider addObject:item];
-    }
+    } failure:^(NSError *error) {
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Error Retrieving Data"
+                                                            message:[error localizedDescription]
+                                                           delegate:nil
+                                                  cancelButtonTitle:@"Ok"
+                                                  otherButtonTitles:nil];
+        [alertView show];
+    }];
+    
 }
+
 
 @end

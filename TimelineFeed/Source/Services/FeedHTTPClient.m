@@ -7,6 +7,7 @@
 //
 
 #import "FeedHTTPClient.h"
+#import "FeedItem.h"
 
 @implementation FeedHTTPClient
 
@@ -36,18 +37,26 @@ static NSString * const FeedURLString = @"http://unii-interview.herokuapp.com/ap
     return self;
 }
 
--(void)readFeedData
+-(void)readFeedDataWithSuccess:(void (^)(NSArray *responseObject))success
+                       failure:(void (^)(NSError *error))failure
 {
     [self GET:@"posts" parameters:nil
-      success:^(NSURLSessionDataTask *task, id responseObject) {
-        if ([self.delegate respondsToSelector:@selector(feedHTTPClient:didUpdateWithData:)]) {
-            [self.delegate feedHTTPClient:self didUpdateWithData:responseObject];
-        }
+      success:^(NSURLSessionDataTask *task, id JSON) {
+          
+          NSArray *postsFromResponse = [JSON valueForKeyPath:@"posts.data"];
+          NSMutableArray *mutablePosts = [NSMutableArray arrayWithCapacity:[postsFromResponse count]];
+          for (NSDictionary *attributes in postsFromResponse) {
+              FeedItem *post = [[FeedItem alloc] initWithDictionary:attributes];
+              [mutablePosts addObject:post];
+          }
+          
+          
+          success([mutablePosts copy]);
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
-        if ([self.delegate respondsToSelector:@selector(feedHTTPClient:didFailWithError:)]) {
-            [self.delegate feedHTTPClient:self didFailWithError:error];
-        }
+        failure(error);
     }];
 }
+
+
 
 @end

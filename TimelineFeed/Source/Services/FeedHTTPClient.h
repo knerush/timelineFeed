@@ -11,16 +11,10 @@
 @protocol FeedHTTPClientDelegate;
 
 @interface FeedHTTPClient : AFHTTPSessionManager
-@property (nonatomic, weak) id<FeedHTTPClientDelegate>delegate;
 
 + (FeedHTTPClient *)sharedFeedHTTPClient;
 - (instancetype)initWithBaseURL:(NSURL *)url;
-- (void)readFeedData;
+- (void)readFeedDataWithSuccess:(void (^)(NSArray *responseObject))success failure:(void (^)(NSError *error))failure;
 
 @end
 
-@protocol FeedHTTPClientDelegate <NSObject>
-@optional
--(void)feedHTTPClient:(FeedHTTPClient *)client didUpdateWithData:(id)data;
--(void)feedHTTPClient:(FeedHTTPClient *)client didFailWithError:(NSError *)error;
-@end
