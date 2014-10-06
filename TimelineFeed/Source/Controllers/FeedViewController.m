@@ -10,16 +10,18 @@
 #import "TableViewCell.h"
 #import "FeedItem.h"
 #import "User.h"
+#import "Pagination.h"
 #import "FeedHTTPClient.h"
 #import "UIImageView+AFNetworking.h"
 
 static const int CELL_CONTENT_MARGIN = 10;
 
 @interface FeedViewController () <UITableViewDataSource, UITableViewDelegate>
-@property (weak, nonatomic) IBOutlet UITableView *tableView;
-@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *spinner;
-@property (nonatomic, strong)NSArray *dataProvider;
+@property(weak, nonatomic) IBOutlet UITableView *tableView;
+@property(weak, nonatomic) IBOutlet UIActivityIndicatorView *spinner;
 
+@property(nonatomic, strong)Pagination *pagination;
+@property(nonatomic, strong)NSArray *dataProvider;
 @end
 
 @implementation FeedViewController
@@ -37,7 +39,9 @@ static const int CELL_CONTENT_MARGIN = 10;
     [self.tableView registerNib:[UINib nibWithNibName:@"TableViewCell" bundle:nil]
          forCellReuseIdentifier:@"Cell"];
     
-    [self readData];
+    _pagination = [[Pagination alloc] initZeroPage];
+    
+    [self readNextPageData];
 }
 
 #pragma mark - table delegate methods
@@ -93,17 +97,68 @@ static const int CELL_CONTENT_MARGIN = 10;
     return _dataProvider.count;
 }
 
+//-(UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
+//{
+//    UIView *footer = [[UIView alloc] init];
+//    
+//    return footer;
+//}
+
+#pragma mark - 
+
+- (void)scrollViewDidEndDragging:(UIScrollView *)aScrollView
+                  willDecelerate:(BOOL)decelerate{
+    
+    CGPoint offset = _tableView.contentOffset;
+    CGRect bounds = _tableView.bounds;
+    CGSize size = _tableView.contentSize;
+    UIEdgeInsets inset = _tableView.contentInset;
+
+    float y = offset.y + bounds.size.height - inset.bottom;
+    float h = size.height;
+    
+    float reload_distance = 50;
+    if(y > h + reload_distance) {
+        NSLog(@"load more data");
+        
+        UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        spinner.frame=CGRectMake(0, 0, 310, 44);
+        [spinner startAnimating];
+        
+        self.tableView.tableFooterView = spinner;
+        
+        [self readNextPageData];
+    }
+}
+
 
 #pragma mark - private methods
 
--(void)readData
+-(void)readNextPageData
 {
-    FeedHTTPClient *client = [FeedHTTPClient sharedFeedHTTPClient];
-    [client readFeedDataWithSuccess:^(NSArray *responseObject) {
+    if ((_pagination.totalPages - 1) < _pagination.currentPage) {
+        NSLog(@"No more data available");
+        return;
+    }
     
-        _dataProvider = responseObject;
-        self.spinner.hidden = YES;
-        [self.tableView reloadData];
+//    NSLog(@"Read data for page %d out of %d", _pagination.currentPage + 1, _pagination.totalPages);
+    FeedHTTPClient *client = [FeedHTTPClient sharedFeedHTTPClient];
+    [client readFeedData:_pagination.nextPageUrl
+                 success:^(NSArray *responseObject, Pagination *pagination) {
+                     int currentCount = _dataProvider.count;
+                     
+                     NSMutableArray *currentDataProvider = [NSMutableArray arrayWithArray:_dataProvider];
+                     [currentDataProvider addObjectsFromArray:responseObject];
+                     _dataProvider = [currentDataProvider copy];
+                     self.spinner.hidden = YES;
+                     [_tableView reloadData];
+                     
+                     [_tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:currentCount inSection:0]
+                                       atScrollPosition:UITableViewScrollPositionTop
+                                               animated:YES];
+                     
+                     _pagination = pagination;
+                     self.tableView.tableFooterView = nil;
 
     } failure:^(NSError *error) {
         UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Error Retrieving Data"

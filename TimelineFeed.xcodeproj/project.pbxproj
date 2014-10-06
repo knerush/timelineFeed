@@ -27,6 +27,7 @@
 		44881DAB19D479AB001D172F /* TableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 44881DA919D479AB001D172F /* TableViewCell.xib */; };
 		44881DB519D563E1001D172F /* FeedHTTPClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 44881DB419D563E1001D172F /* FeedHTTPClient.m */; };
 		44923F1819E1F60D00D9C487 /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = 44923F1719E1F60D00D9C487 /* User.m */; };
+		44923F1B19E2A9CC00D9C487 /* Pagination.m in Sources */ = {isa = PBXBuildFile; fileRef = 44923F1A19E2A9CC00D9C487 /* Pagination.m */; };
 		B4C0A4F92225455192C57969 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A19A5172E215419BB1746D2F /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -70,6 +71,8 @@
 		44881DB419D563E1001D172F /* FeedHTTPClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FeedHTTPClient.m; sourceTree = "<group>"; };
 		44923F1619E1F60D00D9C487 /* User.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = User.h; sourceTree = "<group>"; };
 		44923F1719E1F60D00D9C487 /* User.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = User.m; sourceTree = "<group>"; };
+		44923F1919E2A9CC00D9C487 /* Pagination.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Pagination.h; sourceTree = "<group>"; };
+		44923F1A19E2A9CC00D9C487 /* Pagination.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Pagination.m; sourceTree = "<group>"; };
 		A19A5172E215419BB1746D2F /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		EE16B8F6E69D4D46B04D0807 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -195,6 +198,8 @@
 				44881DA519D37BDD001D172F /* FeedItem.m */,
 				44923F1619E1F60D00D9C487 /* User.h */,
 				44923F1719E1F60D00D9C487 /* User.m */,
+				44923F1919E2A9CC00D9C487 /* Pagination.h */,
+				44923F1A19E2A9CC00D9C487 /* Pagination.m */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -353,6 +358,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				44881DA019D3709D001D172F /* FeedViewController.m in Sources */,
+				44923F1B19E2A9CC00D9C487 /* Pagination.m in Sources */,
 				44923F1819E1F60D00D9C487 /* User.m in Sources */,
 				44881DAA19D479AB001D172F /* TableViewCell.m in Sources */,
 				44881DA619D37BDD001D172F /* FeedItem.m in Sources */,

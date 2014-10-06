@@ -37,21 +37,23 @@ static NSString * const FeedURLString = @"http://unii-interview.herokuapp.com/ap
     return self;
 }
 
--(void)readFeedDataWithSuccess:(void (^)(NSArray *responseObject))success
+-(void)readFeedData:(NSString *)requestStr success:(void (^)(NSArray *posts, Pagination *pagination))success
                        failure:(void (^)(NSError *error))failure
 {
-    [self GET:@"posts" parameters:nil
+    [self GET:requestStr parameters:nil
       success:^(NSURLSessionDataTask *task, id JSON) {
           
+          //serializing posts
           NSArray *postsFromResponse = [JSON valueForKeyPath:@"posts.data"];
           NSMutableArray *mutablePosts = [NSMutableArray arrayWithCapacity:[postsFromResponse count]];
           for (NSDictionary *attributes in postsFromResponse) {
               FeedItem *post = [[FeedItem alloc] initWithDictionary:attributes];
               [mutablePosts addObject:post];
           }
+          //next page url
+          Pagination *paginaiton = [[Pagination alloc] initWithDictionary:[JSON valueForKeyPath:@"posts.pagination"]];
           
-          
-          success([mutablePosts copy]);
+          success([mutablePosts copy], paginaiton);
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
         failure(error);
     }];

@@ -7,6 +7,7 @@
 //
 
 #import "AFHTTPSessionManager.h"
+#import "Pagination.h"
 
 @protocol FeedHTTPClientDelegate;
 
@@ -14,7 +15,7 @@
 
 + (FeedHTTPClient *)sharedFeedHTTPClient;
 - (instancetype)initWithBaseURL:(NSURL *)url;
-- (void)readFeedDataWithSuccess:(void (^)(NSArray *responseObject))success failure:(void (^)(NSError *error))failure;
+- (void)readFeedData:(NSString *)requestStr success:(void (^)(NSArray *posts, Pagination *pagination))success failure:(void (^)(NSError *error))failure;
 
 @end
 

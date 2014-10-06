@@ -8,13 +8,13 @@
 
 #import "FeedItem.h"
 
+@implementation FeedItem
+
 static NSString *const kComments = @"comment_count";
 static NSString *const kContent = @"content";
 static NSString *const kDate = @"created_at";
 static NSString *const kLikes = @"like_count";
 static NSString *const kUser = @"user";
-
-@implementation FeedItem
 
 -(FeedItem *)initWithDictionary:(NSDictionary *)dict
 {

@@ -7,11 +7,12 @@
 //
 
 #import "User.h"
+
+@implementation User
+
 static NSString *const kUserUrl = @"avatar";
 static NSString *const kUserName = @"first_name";
 static NSString *const kUserLastName = @"last_name";
-
-@implementation User
 
 -(User *)initWithDictionary:(NSDictionary *)dict
 {
