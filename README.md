@@ -1,3 +1,3 @@
 
-project uses pods, pleasse use TimelineFeed.xcworkspace to run and compile the project
+project uses pods, please use TimelineFeed.xcworkspace to run and compile the project
 
